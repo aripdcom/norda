@@ -23,4 +23,4 @@ kalır.**
 - **Silme:** Aktiviteler ve noktalar uygulama içinden silinebilir;
   uygulamayı kaldırmak tüm veriyi kaldırır.
 
-İletişim: <https://github.com/aripdcem/norda/issues>
+İletişim: <https://github.com/aripdcom/norda/issues>

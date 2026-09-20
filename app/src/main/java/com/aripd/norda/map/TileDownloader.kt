@@ -19,7 +19,7 @@ import java.security.MessageDigest
 object TileDownloader {
 
     private const val INDEX_URL =
-        "https://raw.githubusercontent.com/aripdcem/norda/main/docs/maps/index.json"
+        "https://raw.githubusercontent.com/aripdcom/norda/main/docs/maps/index.json"
     private const val TIMEOUT_MS = 15_000
 
     class RemotePackage(

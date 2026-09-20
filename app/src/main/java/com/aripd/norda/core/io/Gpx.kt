@@ -63,7 +63,7 @@ object Gpx {
         val appVersion: String? = null
     )
 
-    private const val NORDA_NS = "https://github.com/aripdcem/norda/gpx/1"
+    private const val NORDA_NS = "https://github.com/aripdcom/norda/gpx/1"
 
     /**
      * [segmentBreaks] is parallel to [points] when given: true means that point

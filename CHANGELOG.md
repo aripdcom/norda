@@ -4,6 +4,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/), versioning
 follows [SemVer](https://semver.org/) — see `docs/MVP.md` section 15 for
 the rules.
 
+## [1.7.1] - 2026-09-20
+
+### Changed
+
+- The project moved to `github.com/aripdcom/norda`, so every address the app
+  carries moved with it. The one that matters at runtime is the map package
+  list, which `TileDownloader` fetches from the repository — the old address
+  still redirects today, but a redirect is not a foundation: it breaks the
+  moment anyone creates a repository under the old name. The GPX report's XML
+  namespace follows the same move; it is an identifier rather than a fetched
+  URL, and parsing has always matched on the element prefix, so files written
+  by either version still read. The site links, the privacy contacts, the map
+  index and the pipeline's User-Agent were updated with them.
+
 ## [1.7.0] - 2026-09-17
 
 ### Added

@@ -179,7 +179,7 @@
     <nav class="top-nav" aria-label="On this page">
       <a href="#features">Features</a>
       <a href="#stance">Stance</a>
-      <a href="https://github.com/aripdcem/norda">GitHub</a>
+      <a href="https://github.com/aripdcom/norda">GitHub</a>
     </nav>
   </header>
 
@@ -191,8 +191,8 @@
         Return to Start, waypoints and GPX — all without internet,
         all on your device.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/aripdcem/norda/releases/latest">Download APK <span class="ver"></span></a>
-        <a class="btn ghost" href="https://github.com/aripdcem/norda">Source code</a>
+        <a class="btn primary" href="https://github.com/aripdcom/norda/releases/latest">Download APK <span class="ver"></span></a>
+        <a class="btn ghost" href="https://github.com/aripdcom/norda">Source code</a>
       </div>
       <p class="fineprint">Signed APK · Android 8.0+ · <code>≈110 KB</code> in total · zero runtime dependencies</p>
 
@@ -269,23 +269,23 @@
       <h2>Map packs</h2>
       <p>Region packs are built on this repository's own <strong>GitHub Actions pipeline</strong>,
          versioned, and downloaded with SHA-256 verification. The pack list is on the
-         app's Maps screen; they can also be fetched by hand from <a href="https://github.com/aripdcem/norda/releases">Releases</a>.
+         app's Maps screen; they can also be fetched by hand from <a href="https://github.com/aripdcom/norda/releases">Releases</a>.
          Map data © OpenStreetMap contributors.</p>
     </section>
   </main>
 
   <footer>
-    <span>© 2026 Norda · <a href="https://github.com/aripdcem/norda/blob/main/LICENSE">MIT</a></span>
-    <a href="https://github.com/aripdcem/norda/blob/main/docs/PRIVACY.md">Privacy</a>
-    <a href="https://github.com/aripdcem/norda/releases">Releases</a>
-    <a href="https://github.com/aripdcem/norda/blob/main/docs/MVP.md">MVP document</a>
+    <span>© 2026 Norda · <a href="https://github.com/aripdcom/norda/blob/main/LICENSE">MIT</a></span>
+    <a href="https://github.com/aripdcom/norda/blob/main/docs/PRIVACY.md">Privacy</a>
+    <a href="https://github.com/aripdcom/norda/releases">Releases</a>
+    <a href="https://github.com/aripdcom/norda/blob/main/docs/MVP.md">MVP document</a>
     <span>Map data © OpenStreetMap contributors (ODbL)</span>
   </footer>
 
 </div>
 <script>
   // The only network request: the latest release tag (on failure the button silently stays plain).
-  fetch("https://api.github.com/repos/aripdcem/norda/releases/latest")
+  fetch("https://api.github.com/repos/aripdcom/norda/releases/latest")
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (d && d.tag_name) {

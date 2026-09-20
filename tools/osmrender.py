@@ -791,7 +791,7 @@ DEFAULT_ENDPOINT = "https://overpass-api.de/api/interpreter"
 # same data. Polite pacing between requests keeps us under the rate limits.
 MIRRORS = ["https://overpass.kumi.systems/api/interpreter"]
 REQUEST_PAUSE_S = 3
-USER_AGENT = "norda-map-pack/1.0 (+https://github.com/aripdcem/norda)"
+USER_AGENT = "norda-map-pack/1.0 (+https://github.com/aripdcom/norda)"
 
 _MAJOR = "motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link"
 _MINOR = "unclassified|residential|living_street|track|path"

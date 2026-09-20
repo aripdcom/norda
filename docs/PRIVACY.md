@@ -23,4 +23,4 @@ single sentence: **your location data stays on your device.**
 - **Deletion:** Activities and waypoints can be deleted in-app;
   uninstalling removes all data.
 
-Contact: <https://github.com/aripdcem/norda/issues>
+Contact: <https://github.com/aripdcom/norda/issues>
