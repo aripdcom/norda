@@ -16,6 +16,7 @@ import com.aripd.norda.core.nav.WaypointNaming
 import com.aripd.norda.core.track.ActivitySummary
 import com.aripd.norda.core.track.Battery
 import com.aripd.norda.core.track.ActivityType
+import com.aripd.norda.core.track.AltitudeSmoother
 import com.aripd.norda.core.track.ElevationTracker
 import com.aripd.norda.core.track.Format
 import com.aripd.norda.core.track.Stats
@@ -160,6 +161,9 @@ class HistoryActivity : Activity() {
                     if (first.timeMillis > 0) first.timeMillis else System.currentTimeMillis()
                 val id = dao.startActivity(ActivityType.WALK, startTime)
                 val elevation = ElevationTracker()
+                // The same smoother as the live recording, so an imported
+                // track reads the way it would have been recorded (Y-3).
+                val smoother = AltitudeSmoother()
                 for (p in parsed.points) {
                     // GPX elevations are heights above mean sea level; the
                     // database keeps ellipsoid heights, as the receiver
@@ -174,8 +178,12 @@ class HistoryActivity : Activity() {
                         p.point
                     }
                     dao.appendPoint(id, point, p.hasAltitude, p.afterPause)
-                    if (p.hasAltitude) elevation.onAltitude(point.altitude)
+                    if (p.hasAltitude) {
+                        smoother.onAltitude(point.timeMillis, point.altitude)
+                            .forEach(elevation::onAltitude)
+                    }
                 }
+                smoother.flush().forEach(elevation::onAltitude)
                 val duration =
                     if (first.timeMillis > 0 && last.timeMillis > first.timeMillis)
                         last.timeMillis - first.timeMillis

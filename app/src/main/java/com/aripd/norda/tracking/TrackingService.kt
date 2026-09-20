@@ -121,7 +121,7 @@ class TrackingService : Service(), LocationListener {
             // is approximated from the point span.
             recoveredDurationMillis = (endTime - unfinished.startTimeMillis).coerceAtLeast(0),
             lastPoint = lastPoint,
-            altitudes = dao.altitudesFor(unfinished.id)
+            recoveredAltitudes = dao.altitudesFor(unfinished.id)
         )
         activityId = unfinished.id
         session = s

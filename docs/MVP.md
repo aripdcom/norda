@@ -330,12 +330,35 @@ a single step and the anchor is updated. Test: a noisy series at constant
 altitude → gain 0; a known staircase profile → the expected total.
 Barometric refinement is post-MVP. Gain and loss are computed from the raw
 ellipsoid heights; the geoid correction (5.7) is a near-constant offset and
-cancels in a difference. Known limit (field item Y-3): the accumulator is
-knife-edge. Perturbing a real 1274-point series by ±1 cm moves the gain
-between 47 m and 75 m, because a perturbation flips which steps cross the 4 m
-threshold. The number is reproducible for identical input, which is what the
-field cross-validation checks, but it is not robust; smoothing the series
-before accumulation is the candidate fix.
+cancels in a difference.
+
+**What the accumulator is fed (v1.8.0, field item Y-3).** The threshold alone
+was not enough. GNSS vertical noise separates from the anchor by 4 m often
+enough that the oscillation riding on a real climb was booked as climb: across
+sixteen field tours the figure ran about a quarter high, and against a
+companion's DEM-corrected track two to three times high. It was also unstable
+— perturbing a real 1274-point series by ±1 cm moved the gain between 50 m and
+76 m, because a perturbation flips which step crosses the threshold. So the
+series passes through a **±5 s median** first (`core/track/AltitudeSmoother`):
+a median is unmoved by the outliers in its window, so spikes go and slopes
+stay. On the field tours that removes about a quarter of the total gain and
+roughly halves the instability. Three properties are deliberate:
+
+- The window is bounded in **time**, not in samples. At the usual ~1 Hz
+  cadence nine samples are nine seconds, but on the sparse battery-saver tour
+  (61 points over 33 minutes) the same nine samples span ten minutes and
+  flatten the outing to nothing.
+- A window holding fewer than three samples passes its value through
+  untouched: a median of one or two samples is not a filter.
+- The window is centred, so a sample is booked only once samples five seconds
+  newer exist. The live figure therefore trails the walk by about five
+  seconds, and taking the summary books the tail.
+
+The threshold stays at 4 m. Lowering it after smoothing was measured and
+re-inflates the total (at 2 m the sixteen tours come back to where they
+started), so the pair is calibrated together, not separately. Recovery after
+process death and GPX import feed the same smoother, or a recovered activity
+would read higher than the same outing recorded without interruption.
 
 ### 5.5 Auto-pause
 
@@ -778,7 +801,7 @@ Filters, statistics, elevation hysteresis, auto-pause decisions, stopwatch,
 smoothing, disturbance hysteresis, bearing/distance/ETA, trail guidance
 (nearest point, look-back, off-trail), Web Mercator and tile math (including
 the TMS flip), over-zoom and continuous-zoom arithmetic, the empty-map
-reason, geoid interpolation, solar altitude and the night-mode decision, GPX generation/parsing, row↔model mappers, waypoint
+reason, geoid interpolation, the elevation median, solar altitude and the night-mode decision, GPX generation/parsing, row↔model mappers, waypoint
 naming.
 
 ### 13.3 Field test matrix

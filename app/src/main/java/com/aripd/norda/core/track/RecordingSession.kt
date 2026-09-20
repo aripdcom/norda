@@ -16,7 +16,11 @@ class RecordingSession(
     val startWallMillis: Long,
     startMonotonicMillis: Long,
     private val autoPause: AutoPauseDetector = AutoPauseDetector(),
-    private val elevation: ElevationTracker = ElevationTracker()
+    private val elevation: ElevationTracker = ElevationTracker(),
+    // Y-3: the accumulator is fed a ±5 s median, not raw altitudes. The live
+    // figure therefore trails the walk by about five seconds, and the tail is
+    // booked when the summary is taken.
+    private val altitudes: AltitudeSmoother = AltitudeSmoother()
 ) {
 
     enum class State { RECORDING, PAUSED, AUTO_PAUSED, STOPPED }
@@ -181,9 +185,13 @@ class RecordingSession(
         // finalized here.
         if (gate) filterCounts[GpsFilter.Verdict.ACCEPT.ordinal]++
         recorded += fix
-        if (hasAltitude) elevation.onAltitude(fix.altitude)
+        if (hasAltitude) bookAltitude(fix.timeMillis, fix.altitude)
         out += Accepted(fix, hasAltitude, afterPause = opensNewLeg)
         return out
+    }
+
+    private fun bookAltitude(timeMillis: Long, altitudeM: Double) {
+        altitudes.onAltitude(timeMillis, altitudeM).forEach(elevation::onAltitude)
     }
 
     private fun commitTentative(): Accepted {
@@ -191,7 +199,7 @@ class RecordingSession(
         tentative = null
         filterCounts[GpsFilter.Verdict.ACCEPT.ordinal]++
         recorded += t.point
-        if (t.hasAltitude) elevation.onAltitude(t.point.altitude)
+        if (t.hasAltitude) bookAltitude(t.point.timeMillis, t.point.altitude)
         return t
     }
 
@@ -206,12 +214,14 @@ class RecordingSession(
         recoveredDistanceM: Double,
         recoveredDurationMillis: Long,
         lastPoint: TrackPoint?,
-        altitudes: List<Double>
+        recoveredAltitudes: List<Pair<Long, Double>>
     ) {
         distanceM = recoveredDistanceM
         stopwatch.prime(recoveredDurationMillis)
         lastPoint?.let { recorded += it }
-        altitudes.forEach { elevation.onAltitude(it) }
+        recoveredAltitudes.forEach { (timeMillis, altitudeM) ->
+            bookAltitude(timeMillis, altitudeM)
+        }
     }
 
     fun pauseManual(nowMonotonicMillis: Long) {
@@ -241,8 +251,13 @@ class RecordingSession(
 
     fun currentPaceSecPerKm(): Double? = Stats.currentPaceSecPerKm(recorded)
 
-    fun summary(id: Long, endWallMillis: Long, nowMonotonicMillis: Long): ActivitySummary =
-        ActivitySummary(
+    /**
+     * The closing figures. Taking them books whatever the smoother still
+     * holds (Y-3): the last few seconds of a walk are part of it.
+     */
+    fun summary(id: Long, endWallMillis: Long, nowMonotonicMillis: Long): ActivitySummary {
+        altitudes.flush().forEach(elevation::onAltitude)
+        return ActivitySummary(
             id = id,
             type = type,
             startTimeMillis = startWallMillis,
@@ -252,4 +267,5 @@ class RecordingSession(
             elevationGainM = elevationGainM,
             elevationLossM = elevationLossM
         )
+    }
 }

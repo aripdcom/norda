@@ -274,14 +274,19 @@ class RecordingSessionTest {
             recoveredDistanceM = 500.0,
             recoveredDurationMillis = 600_000,
             lastPoint = fix(0, 0.0, alt = 100.0),
-            altitudes = listOf(100.0, 110.0, 105.0)
+            // 30 s apart: too sparse for the median to have a window, so the
+            // stored altitudes pass through untouched (Y-3).
+            recoveredAltitudes = listOf(0L to 100.0, 30_000L to 110.0, 60_000L to 105.0)
         )
         assertEquals(500.0, s.distanceM, 1e-9)
         assertEquals(610_000, s.durationMillis(10_000))
-        assertEquals(10.0, s.elevationGainM, 1e-9)
-        assertEquals(5.0, s.elevationLossM, 1e-9)
         assertEquals(1, s.onFix(fix(5_000, 1.0), false, 5_000).size)
         assertEquals(510.0, s.distanceM, 0.5)
+        // Elevation is complete once the smoother's tail is booked, which is
+        // what taking the summary does.
+        val recovered = s.summary(id = 7, endWallMillis = 1_006_000, nowMonotonicMillis = 10_000)
+        assertEquals(10.0, recovered.elevationGainM, 1e-9)
+        assertEquals(5.0, recovered.elevationLossM, 1e-9)
     }
 
     // A fix that reports no altitude does not enter the elevation calculation
@@ -292,7 +297,8 @@ class RecordingSessionTest {
         s.onFix(fix(0, 0.0, alt = 100.0), true, 0)
         s.onFix(fix(5_000, 1.0, alt = 0.0), false, 5_000)     // hasAltitude=false
         s.onFix(fix(10_000, 2.0, alt = 110.0), true, 10_000)
-        assertEquals(10.0, s.elevationGainM, 1e-9)
-        assertEquals(0.0, s.elevationLossM, 1e-9)
+        val sum = s.summary(id = 1, endWallMillis = 1_010_000, nowMonotonicMillis = 10_000)
+        assertEquals(10.0, sum.elevationGainM, 1e-9)
+        assertEquals(0.0, sum.elevationLossM, 1e-9)
     }
 }

@@ -259,30 +259,29 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   "amber looks better this way" — the default stays, and matrix step 22 is
   complete on both halves, the automatic arrival and the legibility.
 
-- **Y-3** (elevation metric, watch item — decision pending): gain and loss are
-  not robust, and they are probably inflated. Three lines of evidence.
-  *Instability:* perturbing a real 1274-point series by ±1 cm moves the gain
-  between **47 m and 75 m** over 20 runs, because the perturbation flips which
-  steps cross the 4 m hysteresis threshold. The number is reproducible for
-  identical input — the zero-difference check still means what it meant — but
-  it is a knife-edge, so comparing two devices or two versions on ▲/▼ alone is
-  not sound. *Magnitude:* across all 14 field tours the recomputation
-  reproduces the app exactly, and a 9-sample median before the accumulator
-  removes **33%** of the total gain (34.5 → 23.1 m/km). *Reference:* on the
-  three tours with a companion's DEM-corrected Strava track, the same
-  accumulator over that smooth series gives 20, 16 and 24 m where Norda gives
-  71, 79 and 174 — a DEM erases genuine micro-relief, so the truth sits
-  between, but the direction is clear.
+- **Y-3** (elevation metric, fixed → v1.8.0): gain and loss were inflated and
+  unstable. *Instability:* perturbing a real 1274-point series by ±1 cm moved
+  the gain between **50 m and 76 m**, because a perturbation flips which step
+  crosses the 4 m threshold. *Magnitude:* across sixteen field tours a median
+  before the accumulator removes about a **quarter** of the total gain, and on
+  the three tours with a companion's DEM-corrected track the same accumulator
+  over that smooth series gives 35, 29 and 46 m where Norda gave 71, 79 and
+  174. A DEM erases genuine micro-relief, so the truth sits between, but the
+  direction was never in doubt.
 
-  Candidate fix, with one trap already found: the median window must be bounded
-  in **time**, not in samples. On the sparse battery-saver tour (61 points over
-  33 min) a 9-sample window spans ten minutes and flattens the gain to zero,
-  while at the normal ~1 Hz cadence it spans nine seconds. A ±5 s window with a
-  minimum of three samples behaves the same way on both. Not shipped: it moves
-  a headline number on every past recording, so it waits for a decision.
-  Methodology, already fixed: the analysis tool adds the geoid separation back
-  before recomputing (the file's `ele` is sea level since v1.5.0) and then
-  reproduces the app exactly.
+  Fixed by feeding the accumulator a **±5 s median** (`core/track/
+  AltitudeSmoother`, 6 JVM tests; core: 174). Measured on the field files
+  through the production path: Sept 18 ▲44 → ▲36.5, Sept 15 ▲118 → ▲91,
+  Sept 17 ▲138 → ▲121, and the ±1 cm band narrows from 50–76 m to 35–49 m.
+  Three decisions are worth keeping: the window is bounded in **time** rather
+  than samples (nine samples span ten minutes on the sparse battery-saver
+  tour and flatten it to zero); a window with fewer than three samples passes
+  through untouched; and the **4 m threshold stays** — lowering it after
+  smoothing was measured and re-inflates the total, so the pair is calibrated
+  together. Past recordings keep the numbers they were recorded with: ▲/▼ was
+  always a noisy estimate, and rewriting stored figures retroactively would be
+  worse than a dated method change. The analysis tool prints both methods, so
+  older files can still be cross-validated.
 
 - **Y-1** (elevation, fixed → v1.5.0): absolute altitude read about 37 m
   high. Three independent measurements agreed. Two seaside walks (Sept 1 and

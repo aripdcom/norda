@@ -143,15 +143,19 @@ class ActivityDao(private val helper: AppDatabase) {
             null, null, null, null, "id DESC", "1"
         ).use { c -> if (c.moveToFirst()) c.getDouble(0) to c.getDouble(1) else null }
 
-    /** Altitudes of the points that reported a valid altitude, in time order. */
-    fun altitudesFor(activityId: Long): List<Double> =
+    /**
+     * Altitudes of the points that reported a valid altitude, with their
+     * timestamps, in time order. The time comes along because the elevation
+     * smoother's window is measured in seconds (Y-3, MVP 5.4).
+     */
+    fun altitudesFor(activityId: Long): List<Pair<Long, Double>> =
         helper.readableDatabase.query(
-            "track_point", arrayOf("altitude"),
+            "track_point", arrayOf("timestamp", "altitude"),
             "activity_id = ? AND altitude IS NOT NULL", arrayOf(activityId.toString()),
             null, null, "timestamp ASC"
         ).use { c ->
-            val out = ArrayList<Double>(c.count)
-            while (c.moveToNext()) out += c.getDouble(0)
+            val out = ArrayList<Pair<Long, Double>>(c.count)
+            while (c.moveToNext()) out += c.getLong(0) to c.getDouble(1)
             out
         }
 

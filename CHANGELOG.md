@@ -4,6 +4,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com/), versioning
 follows [SemVer](https://semver.org/) — see `docs/MVP.md` section 15 for
 the rules.
 
+## [1.8.0] - 2026-09-20
+
+### Changed
+
+- Y-3: elevation gain and loss are computed from a smoothed altitude series.
+  The 4 m hysteresis was not enough on its own — GNSS vertical noise
+  separates from the anchor by that much often enough that the oscillation
+  riding on a real climb was booked as climb. Across sixteen field tours the
+  figure ran about a quarter high, and against a companion's DEM-corrected
+  track two to three times high; it was also unstable, moving between 50 m
+  and 76 m on the same walk when the series was perturbed by a centimetre.
+  The accumulator now takes a **±5 s median** first
+  (`core/track/AltitudeSmoother`, 6 JVM tests, core: 174): spikes go, slopes
+  stay. On the last three field walks the gain reads 36.5 instead of 44, 91
+  instead of 118, and 121 instead of 138, and the instability band narrows to
+  35–49 m.
+- Three details are deliberate. The window is bounded in time rather than in
+  samples, because nine samples span ten minutes on a sparse battery-saver
+  recording and would flatten the outing to nothing. A window holding fewer
+  than three samples passes its value through untouched. And the threshold
+  stays at 4 m: lowering it after smoothing was measured and re-inflates the
+  total, so the two are calibrated together.
+- Recovery after process death and GPX import feed the same smoother, so a
+  recovered or imported activity reads the way it would have been recorded.
+  Past recordings keep the numbers they were recorded with; the method change
+  is dated rather than applied backwards.
+
 ## [1.7.1] - 2026-09-20
 
 ### Changed

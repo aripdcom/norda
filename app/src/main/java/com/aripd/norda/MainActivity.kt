@@ -23,6 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.aripd.norda.core.sun.NightPolicy
 import com.aripd.norda.core.track.ActivityType
+import com.aripd.norda.core.track.AltitudeSmoother
 import com.aripd.norda.core.track.ElevationTracker
 import com.aripd.norda.core.track.GpsFilter
 import com.aripd.norda.core.track.Stats
@@ -403,8 +404,15 @@ class MainActivity : Activity(), LocationListener {
         }
         // Paused legs stay out of the distance on recovery too (F-17).
         val distance = Stats.totalDistanceMeters(points, stored.map { it.afterPause })
+        // Elevation is rebuilt through the same smoother the live recording
+        // uses, or a recovered activity would read higher than the same outing
+        // recorded without interruption (Y-3, MVP 5.4).
         val elevation = ElevationTracker()
-        dao.altitudesFor(unfinished.id).forEach { elevation.onAltitude(it) }
+        val smoother = AltitudeSmoother()
+        dao.altitudesFor(unfinished.id).forEach { (timeMillis, altitudeM) ->
+            smoother.onAltitude(timeMillis, altitudeM).forEach(elevation::onAltitude)
+        }
+        smoother.flush().forEach(elevation::onAltitude)
         val endTime = points.lastOrNull()?.timeMillis ?: unfinished.startTimeMillis
         dao.finishActivity(
             com.aripd.norda.core.track.ActivitySummary(
