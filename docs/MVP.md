@@ -360,6 +360,20 @@ started), so the pair is calibrated together, not separately. Recovery after
 process death and GPX import feed the same smoother, or a recovered activity
 would read higher than the same outing recorded without interruption.
 
+**Known limit: the figure still has no fixed scale** (measured on the Sept 24
+walk, field item Y-3). A ±5 s median removes spikes, but GNSS vertical error
+also wanders slowly, and that part survives the window: on that walk 70 of the
+73 booked steps were between 4 and 6 m, with ±5 m swings inside 30 seconds, and
+reading the **same** smoothed series at coarser steps gives ▲171 m at 1 Hz, 132
+at 30 s and 109 at 60 s without ever settling. A figure that depends on the fix
+rate cannot be compared between two devices or two recording cadences, which is
+why the smoother halved the error rather than removing it. Fixing it needs a
+scale the method commits to, and choosing that scale needs a reference the
+walks do not yet provide: an **out-and-back or a loop** makes the recording its
+own reference, because the same ground must give the same height (field item
+D-2). Until then the method stays as it is rather than being tuned against a
+criterion that would reward heavier smoothing for its own sake.
+
 ### 5.5 Auto-pause
 
 - If **20 s** pass without an accepted fix (while fixes keep arriving)
@@ -702,6 +716,18 @@ already produces. The Return to Start line stays as it is.
   level**, which is what other tools read it as: the geoid correction (5.7) is
   applied on the way out and undone on the way in, so a round trip returns the
   same recording.
+- **Which waypoints travel with a track** (F-18): the ones **saved during the
+  recording**, and the ones the walk **went past** — within 250 m of some
+  recorded point (`core/nav/WaypointScope`). Waypoints are global here, not
+  owned by an activity, and the export used to write all of them into every
+  file: the Sept 24 walk's file carried a marker 5.3 km from the route. A GPX
+  is read as the record of one outing, so an unrelated marker misleads every
+  tool that opens it — and a file sent to someone else carried every place its
+  owner had ever marked, which for an app that promises verifiable privacy is a
+  leak rather than an inconvenience. Backing up the whole waypoint collection is
+  a different job from exporting a track and is not this one. The export toast
+  names both counts, so what left the phone is visible before the file is
+  shared.
 - **Telemetry** (F-3): the app's summary (distance/active time/elevation),
   battery and filter counters are embedded as `norda:report` inside GPX 1.1
   `extensions` — the field report is a single file. Other tools ignore the

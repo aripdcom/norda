@@ -112,7 +112,7 @@
     <string name="waypoints_hint">Nokta yok — yönetmek için dokun.</string>
     <string name="wpt_line">%1$s %2$d° · %3$s</string>
     <string name="gpx_export">GPX</string>
-    <string name="gpx_exported">GPX kaydedildi.</string>
+    <string name="gpx_exported">GPX kaydedildi: %1$d iz noktası, %2$d nokta.</string>
     <string name="gpx_export_failed">GPX dosyası kaydedilemedi.</string>
     <string name="gpx_import">GPX içe aktar</string>
     <string name="gpx_imported">Alındı: %1$d iz noktası, %2$d nokta.</string>

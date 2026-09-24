@@ -11,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import com.aripd.norda.core.io.Gpx
 import com.aripd.norda.core.nav.WaypointNaming
+import com.aripd.norda.core.nav.WaypointScope
+import com.aripd.norda.core.track.ActivitySummary
 import com.aripd.norda.geo.Geoids
 import com.aripd.norda.map.MapHint
 import com.aripd.norda.map.MapPackages
@@ -115,7 +117,7 @@ class MapActivity : Activity() {
             .show()
     }
 
-    // ---- GPX export: track + all waypoints in a single file (MVP section 10) ----
+    // ---- GPX export: the track + the outing's waypoints in one file (MVP 10) ----
 
     private fun exportFileName(): String {
         val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
@@ -130,6 +132,7 @@ class MapActivity : Activity() {
         try {
             val dao = ActivityDao(AppDatabase.get(this))
             val detailed = dao.pointsDetailed(activityId)
+            val summary = dao.summary(activityId)
             // Every other tool reads GPX <ele> as height above mean sea level,
             // while the database keeps the receiver's ellipsoid height — in
             // Istanbul the two differ by ~37 m (Y-1, MVP 5.7). The conversion
@@ -146,7 +149,19 @@ class MapActivity : Activity() {
                     point
                 }
             }
-            val waypoints = waypointDao.list().map { w ->
+            // Only the waypoints that belong to this outing travel with it
+            // (F-18): the ones saved during the recording, and the ones the
+            // walk went past. The rest stay on the phone — a track file is not
+            // a backup of every place the owner has ever marked.
+            val track = detailed.map { it.point }
+            val waypoints = WaypointScope.forTrack(
+                waypoints = waypointDao.list(),
+                track = track,
+                startMillis = summary?.startTimeMillis
+                    ?: track.firstOrNull()?.timeMillis ?: 0L,
+                endMillis = summary?.endTimeMillis
+                    ?: track.lastOrNull()?.timeMillis ?: 0L
+            ).map { w ->
                 val altitude = w.altitude
                 if (altitude != null) {
                     w.copy(altitude = Geoids.toMsl(this, w.latitude, w.longitude, altitude))
@@ -159,7 +174,7 @@ class MapActivity : Activity() {
                 points = points,
                 altitudeValid = detailed.map { it.hasAltitude },
                 waypoints = waypoints,
-                report = buildReport(dao),
+                report = buildReport(summary),
                 // A manual pause becomes a new <trkseg>: no tool draws or
                 // counts a line across ground covered while paused (F-17).
                 segmentBreaks = detailed.map { it.afterPause }
@@ -167,7 +182,13 @@ class MapActivity : Activity() {
             contentResolver.openOutputStream(uri)?.use { out ->
                 out.write(xml.toByteArray(Charsets.UTF_8))
             } ?: throw IllegalStateException("could not open the output stream")
-            Toast.makeText(this, R.string.gpx_exported, Toast.LENGTH_SHORT).show()
+            // The toast says what left the phone: on a file that may be
+            // shared, the waypoint count is the part worth seeing (F-18).
+            Toast.makeText(
+                this,
+                getString(R.string.gpx_exported, points.size, waypoints.size),
+                Toast.LENGTH_SHORT
+            ).show()
         } catch (e: Exception) {
             Toast.makeText(this, R.string.gpx_export_failed, Toast.LENGTH_LONG).show()
         }
@@ -179,8 +200,8 @@ class MapActivity : Activity() {
      * counters belong to the last recording, not to the activity, and an old
      * track exported later must not get the wrong counters embedded.
      */
-    private fun buildReport(dao: ActivityDao): Gpx.Report? {
-        val s = dao.summary(activityId) ?: return null
+    private fun buildReport(s: ActivitySummary?): Gpx.Report? {
+        if (s == null) return null
         val prefs = getSharedPreferences(
             com.aripd.norda.tracking.TrackingService.FILTER_STATS_PREFS, MODE_PRIVATE
         )

@@ -16,8 +16,8 @@ android {
         // the app leaves the window insets itself (MainActivity.applyInsets).
         targetSdk = 35
         // versionCode = MAJOR×10000 + MINOR×100 + PATCH (docs/MVP.md, 15.1)
-        versionCode = 10800
-        versionName = "1.8.0"
+        versionCode = 10801
+        versionName = "1.8.1"
     }
 
     /**

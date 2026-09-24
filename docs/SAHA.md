@@ -108,6 +108,7 @@ the tour is repeated on that release. Three clean tours = the v1.0.0 gate.
 | + | 2026-09-15 | v1.6.0 | *Short evening walk (1.64 km, 16:47 point span / 20:40 active, 22:54–23:11 local) — cross-validation ZERO difference: 1640.0 ↔ 1640.0 m; 480 points = accepted; rejections accuracy 1, teleport 0 (jitter 344); three gaps over 5 s, longest 8 s; acquisition + finish tail 3:53 (started indoors). **Second charge-counter measurement (B-1):** 3 352 482 → 3 333 477 µAh = **19 mAh · 0.50% · 1.78 %/h** — far below the 4.67 %/h of the Sept 13 run, and the counter is precise enough that the difference is real rather than rounding; the old "4–5 %/h band" came from integer readings whose error bars were ±1.5 %/h, so the band itself needs rebuilding from counter data. **▲118 m on a 1.64 km walk → Y-3 evidence:** the profile is a genuine climb (123 → 180 m raw over the outing, ~57 m net) with ±10 m oscillations riding on it; a 9-sample median leaves ▲84. **Y-2 again, strongest yet:** 54 steps above 3 m/s totalling 280 m, **17.1% of the distance**, top step 8.88 m/s (32 km/h) on a walk whose median step is 1.61 m/s. Night mode was on (amber by default since v1.6.0); no legibility complaint this time, awaiting the verdict*
 | + | 2026-09-17 | v1.6.0 | *Afternoon walk with a long indoor stretch (app 3704.5 m, 76:59 point span / 63:58 active, 14:26–15:43 local) — 1242 points = accepted; rejections accuracy 0, teleport 1 (jitter 1317); 16 gaps over 5 s totalling 30:50. **First cross-validation that did not match at first sight:** the raw sum of the exported points is 4021.4 m against the app's 3704.5 m, and the difference — **316.9 m** — is exactly the one jump across the 24:36 gap at 15:06 (317.0 m). So the app skipped that leg, which in the code only a **manual pause** does (`resumeManual` sets the break; the settling gate cannot reopen mid-recording). The user reports going into a shopping mall with the recording left running → **F-17**: the file cannot tell a pause from a GPS outage, the two differ by hundreds of metres, and only the pause path drops the leg. **Resolved by the user the same day: the Pause button was tapped deliberately, a while after going inside.** So nothing misbehaved, and the pocket-tap suspicion is closed without a finding. The arithmetic fits the account exactly: of the tour's 76:59 span, 13:01 was not active (manual pause plus any auto-pauses), so **at least 11:34 of the 24:36 gap was recorded-but-fixless indoor time** and the rest was the deliberate pause. Two behaviours are visible in one gap: indoors the device offered nothing at all rather than bad fixes (accuracy rejections 0 over the whole tour — the clean-track stance doing its job), and the paused leg was dropped from the distance. **Third charge-counter measurement (B-1):** 3 500 721 → 3 189 039 µAh = **312 mAh · 8.19% · 6.38 %/h** over wall time (7.68 %/h over active time), and the integer gauge agrees for once (9% → 7.0 %/h) because the tour is long enough for granularity not to dominate. Counter band so far: 1.78 · 4.67 · 6.38 %/h. Elevation ▲138/▼219 raw over 3.7 km with a 97 m corrected span — Y-3 again*
 | + | 2026-09-18 | v1.6.0 | *Short morning walk (1.12 km, 12:19 point span / 13:35 active, 09:28–09:40 local) — clean: cross-validation ZERO difference (1120.4 ↔ 1120.4 m), 358 points = accepted, accuracy rejections 0, one 6 s gap; the raw reconstruction reproduces ▲44/▼34 exactly. Teleport rejections 4 on a 12-minute walk, all filtered. **Amber confirmed in the field (F-16 closed, matrix 22 complete):** the user tested the strengths on the previous night walk — "amber looks better this way" — so the default stays where v1.6.0 put it. **Fourth charge-counter measurement, and it reframes B-1:** 106.4 mAh in 12.3 minutes = 8.64 mAh/min, against 0.92 on the Sept 15 evening walk of similar length. A 9× spread across four tours is not a GPS figure: the counter measures the **device**, so it includes the screen at outdoor brightness and anything else running*
+| + | 2026-09-24 | v1.8.0 | *Evening walk (4.35 km, 50:29 point span / 52:27 active, 21:41–22:32 local) — **the first tour recorded on v1.8.0**, and the release verifies itself: cross-validation ZERO difference (4346.4 ↔ 4346.4 m) and the median path reproduces the app's ▲171/▼144 **exactly**, where the pre-1.8.0 raw path on the same file gives ▲192/▼167. Clean recording: 1401 points = accepted, accuracy rejections 12, **teleport 0**, jitter 1219; 11 gaps over 5 s totalling 1:54 (longest 33 s); acquisition + finish tail 1:58. Night mode was on by itself (amber), no complaint. **Fifth charge-counter measurement (B-1), the highest rate yet:** 3 641 358 → 3 386 691 µAh = **254.7 mAh · 6.64% · 7.90 %/h** over wall time (7.60 over active), 5.04 mAh/min; the capacity estimate lands at 3833 mAh, within 2% of the two Sept 13 readings, so the counter stays consistent. Counter band: 1.78 · 4.67 · 6.38 · 7.90 %/h. **Y-2 mild:** 40 steps above 3 m/s totalling 174.8 m (4.0% of the distance), top 5.02 m/s on a median step of 1.51 m/s. **Two findings.** ▲171 on 4.35 km is 39 m/km, so the smoother's residue was measured properly: the grade at a 30 s scale is walkable (median 4.8%, p99 26%, only 4% of the rise steeper than 30%), so the hills are real, but **70 of the 73 booked steps are 4–6 m** and the same smoothed series read at coarser steps gives ▲171 (1 Hz) → 154 (15 s) → 132 (30 s) → 109 (60 s) → 86 (120 s) without settling — the figure has no fixed scale (**Y-3 residue**, MVP 5.4). The route never comes within 40 m of itself, so the walk cannot serve as its own vertical reference → **D-2**. And the file carried **one waypoint 5278 m from the nearest track point**, saved on another day → **F-18** → v1.8.1*
 
 Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
 
@@ -222,6 +223,22 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   tiles (`core/map/Overzoom`, JVM-tested); lines soften with each level —
   the honest cost of not having the data. Rendering packs to z14 stays a
   candidate if the field asks for sharper streets.
+- **F-18** (Sept 24 walk, fixed → v1.8.1): the export wrote **every saved
+  waypoint** into every activity's file. The Sept 24 file carried a marker
+  **5278 m** from the nearest track point, saved on another day — 21× the new
+  margin. Two costs, and the second is the serious one: a GPX is read as the
+  record of one outing, so an unrelated marker misleads every tool that opens
+  it; and a file sent to someone else carried every place its owner had ever
+  marked, which for an app whose stance is "permission list = verifiable
+  privacy" is a leak, not an inconvenience. Fixed by scoping the file to the
+  waypoints that belong to the outing — saved **during the recording**, or
+  **within 250 m** of some recorded point (`core/nav/WaypointScope`, 7 JVM
+  tests; core: 181). The window is the recording's own bounds rather than the
+  first accepted point, so a waypoint saved while GPS was still settling
+  travels too. The export toast now names both counts, so what left the phone
+  is visible before the file is shared. Backing up the whole collection is a
+  different job and is not this one.
+
 - **F-17** (Sept 17 walk, fixed → v1.7.0): the file could not say where the
   recording was paused. A 24:36 gap carrying a 317 m jump looks identical in
   the GPX whether the user paused deliberately, the app auto-paused, or GPS
@@ -282,6 +299,25 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   always a noisy estimate, and rewriting stored figures retroactively would be
   worse than a dated method change. The analysis tool prints both methods, so
   older files can still be cross-validated.
+
+  **Residue, measured on the Sept 24 walk (open).** The window removes spikes
+  but not the slow wander of the vertical error, and the walk shows it plainly:
+  ▲171 on 4.35 km, with **70 of the 73 booked steps between 4 and 6 m** and
+  ±5 m swings inside 30 seconds. The relief is genuine — at a 30 s scale the
+  grade is walkable (median 4.8%, p99 26%, only 4% of the rise steeper than
+  30%) — but reading the *same* smoothed series at coarser steps gives ▲171 at
+  1 Hz, 154 at 15 s, 132 at 30 s, 109 at 60 s and 86 at 120 s, with no plateau.
+  A figure that moves with the fix rate cannot be compared between devices or
+  cadences. Five candidate windows were measured on this file, and the ranking
+  is exactly why the method was not changed on the spot: a ±30 s median cuts
+  the phantom gain over flat ground carrying this walk's own fast noise from
+  78 m to 13 m, but that criterion is biased — the "noise" was extracted as the
+  series minus a 120 s average, so it contains real features shorter than two
+  minutes, and heavier smoothing scores better by erasing them. Resampling by
+  path distance, which looked promising for scale stability (6% spread across
+  fix rates, the best of the five), is *worse* on phantom gain (107 m), because
+  picking one sample per 20 m keeps that sample's full noise. The honest next
+  step is the reference tour, **D-2**, not another guess.
 
 - **Y-1** (elevation, fixed → v1.5.0): absolute altitude read about 37 m
   high. Three independent measurements agreed. Two seaside walks (Sept 1 and
@@ -352,6 +388,21 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   only once per recording, so a pack downloaded in the middle of an outing was
   ignored until the next recording. The tour data itself was clean (zero
   difference), which is consistent with the map being a display problem only.
+
+- **D-2** (open, needs one tour): **a walk that is its own reference.** The
+  vertical error can be measured without a DEM and without a second device, if
+  the route passes the same ground twice: real height repeats, so whatever the
+  altitudes differ by at a revisited point is error. Every tour so far has been
+  a one-way route — the Sept 24 walk never comes within **40 m** of itself, so
+  the test had nothing to work with. What is needed is one **out-and-back**
+  (same path there and back) or a **loop that crosses itself**, ordinary pace,
+  nothing else special. That single tour turns the Y-3 residue from an argument
+  into a number: it gives the noise amplitude and the time scale over which it
+  wanders, and the median window can then be calibrated instead of guessed. A
+  second, cheaper tour would help too — a **flat seaside walk**, where any ▲ at
+  all is phantom by definition. Without either, every candidate window can only
+  be ranked against criteria that reward heavier smoothing for its own sake,
+  which is how a metric gets tuned into looking good rather than being right.
 
 - **Y-2** (watch item, v1.3.0 walk): the filter is calibrated for running,
   and a walk shows it. The 10 m/s cap (F-11) let a **48.3 m step in 5 s

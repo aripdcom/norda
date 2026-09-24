@@ -112,7 +112,7 @@
     <string name="waypoints_hint">No waypoints — tap to manage.</string>
     <string name="wpt_line">%1$s %2$d° · %3$s</string>
     <string name="gpx_export">GPX</string>
-    <string name="gpx_exported">GPX saved.</string>
+    <string name="gpx_exported">GPX saved: %1$d track points, %2$d waypoints.</string>
     <string name="gpx_export_failed">Could not save the GPX file.</string>
     <string name="gpx_import">Import GPX</string>
     <string name="gpx_imported">Imported: %1$d track points, %2$d waypoints.</string>

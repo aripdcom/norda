@@ -4,6 +4,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/), versioning
 follows [SemVer](https://semver.org/) — see `docs/MVP.md` section 15 for
 the rules.
 
+## [1.8.1] - 2026-09-24
+
+### Fixed
+
+- F-18: a track's GPX carried **every saved waypoint**, not the outing's. The
+  Sept 24 evening walk's file held a marker 5278 m from the nearest track
+  point, saved on another day. A GPX is read as the record of one outing, so an
+  unrelated marker misleads every tool that opens it — and a file sent to
+  someone else carried every place its owner had ever marked, which for an app
+  whose stance is "permission list = verifiable privacy" is a leak rather than
+  an inconvenience. A waypoint now travels with a track when it was saved
+  **during the recording** or when the walk **went past it**, within 250 m of
+  some recorded point (`core/nav/WaypointScope`, 7 JVM tests; core: 181). The
+  window is the recording's own bounds, not the first accepted point, so a
+  waypoint saved while GPS was still settling travels too. Keeping a backup of
+  the whole waypoint collection is a different job and is not this one.
+
+### Changed
+
+- The export toast names what left the phone — track points and waypoints —
+  because on a file that may be shared, the second count is the one worth
+  seeing before sharing it.
+- `docs/MVP.md` 5.4 records a measured limit of the elevation figure rather
+  than leaving it implied: the ±5 s median removes spikes but not the slow
+  wander of GNSS vertical error, so the figure still has no fixed scale. On the
+  Sept 24 walk 70 of the 73 booked steps are 4–6 m, and the same smoothed
+  series read at coarser steps gives ▲171 m at 1 Hz, 132 at 30 s and 109 at
+  60 s without settling. Fixing that needs a reference the walks do not yet
+  provide — an out-and-back or a self-crossing loop, where the same ground must
+  give the same height (field item D-2) — so the method is left as it is rather
+  than tuned against a criterion that rewards heavier smoothing for its own
+  sake.
+
 ## [1.8.0] - 2026-09-20
 
 ### Changed
