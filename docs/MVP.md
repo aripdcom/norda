@@ -332,17 +332,17 @@ Barometric refinement is post-MVP. Gain and loss are computed from the raw
 ellipsoid heights; the geoid correction (5.7) is a near-constant offset and
 cancels in a difference.
 
-**What the accumulator is fed (v1.8.0, field item Y-3).** The threshold alone
+**What the accumulator is fed (v1.8.0, window calibrated in v1.9.0; field
+item Y-3).** The threshold alone
 was not enough. GNSS vertical noise separates from the anchor by 4 m often
 enough that the oscillation riding on a real climb was booked as climb: across
 sixteen field tours the figure ran about a quarter high, and against a
 companion's DEM-corrected track two to three times high. It was also unstable
 — perturbing a real 1274-point series by ±1 cm moved the gain between 50 m and
 76 m, because a perturbation flips which step crosses the threshold. So the
-series passes through a **±5 s median** first (`core/track/AltitudeSmoother`):
+series passes through a **±30 s median** first (`core/track/AltitudeSmoother`):
 a median is unmoved by the outliers in its window, so spikes go and slopes
-stay. On the field tours that removes about a quarter of the total gain and
-roughly halves the instability. Three properties are deliberate:
+stay. Three properties are deliberate:
 
 - The window is bounded in **time**, not in samples. At the usual ~1 Hz
   cadence nine samples are nine seconds, but on the sparse battery-saver tour
@@ -350,9 +350,10 @@ roughly halves the instability. Three properties are deliberate:
   flatten the outing to nothing.
 - A window holding fewer than three samples passes its value through
   untouched: a median of one or two samples is not a filter.
-- The window is centred, so a sample is booked only once samples five seconds
-  newer exist. The live figure therefore trails the walk by about five
-  seconds, and taking the summary books the tail.
+- The window is centred, so a sample is booked only once samples half a
+  minute newer exist. The live figure therefore trails the walk by about that
+  much, and taking the summary books the tail — a finished activity is never
+  short of its last stretch.
 
 The threshold stays at 4 m. Lowering it after smoothing was measured and
 re-inflates the total (at 2 m the sixteen tours come back to where they
@@ -360,35 +361,45 @@ started), so the pair is calibrated together, not separately. Recovery after
 process death and GPX import feed the same smoother, or a recovered activity
 would read higher than the same outing recorded without interruption.
 
-**Known limit: the window is too short, and there is now a reference that
-says so** (field item Y-3). A ±5 s median removes spikes, but GNSS vertical
-error also wanders slowly and that part survives the window: on the Sept 24
-walk 70 of the 73 booked steps were between 4 and 6 m, with ±5 m swings inside
-30 seconds, and reading the same smoothed series at coarser steps kept moving
-the total. That evidence could not settle a window on its own, because the only
-criterion available on a one-way route rewards heavier smoothing.
+**How the half minute was measured (v1.9.0).** The first version of the filter
+used ±5 s, which removes spikes but not the slow wander of the vertical error.
+The Sept 24 walk showed the symptom — 70 of its 73 booked steps were between
+4 and 6 m, with ±5 m swings inside 30 seconds — but could not settle a width,
+because the only criterion available from a one-way recording rewards more
+smoothing for its own sake.
 
-The Oct 10 night walk supplied the missing reference from an unexpected
-direction: a companion's DEM-corrected track over the same route, giving **nine
-stretches and 7.19 km of ground measured twice**, by GNSS and by a DEM. Over
-that ground the shipped method books **▲281 m against the DEM's ▲127 m**, and
-the per-stretch pattern identifies the cause instead of just the size — on a
-601 m stretch that genuinely climbs (DEM rise 19.1 m, net +19.1) the method is
-**exact** at 19.0 m, while on a 922 m stretch that ends where it began (DEM rise
-10.9 m, net −0.7) it says 56.5 m. Right about climb, wrong about flat ground,
-which is noise and not calibration. The control rules out the alternative
-reading: coarsening our own series costs 40% of the figure while coarsening the
-DEM over the same ground costs nothing, so what coarsening drops is noise.
+The Oct 10 night walk supplied a reference from an unexpected direction: a
+companion's DEM-corrected track over the same route, coinciding within 15 m
+across **nine stretches and 7.19 km** — the same ground measured twice, by GNSS
+and by a DEM. Over it ±5 s booked **▲281 m against the DEM's own ▲127 m**, and
+the per-stretch pattern named the cause rather than the size: on a 601 m
+stretch that genuinely climbs (DEM rise 19.1 m, net +19.1) it was **exact** at
+19.0 m, while on a 922 m stretch ending where it began (DEM rise 10.9 m, net
+−0.7) it said 56.5 m. Right about climb, wrong about flat ground — noise, not
+calibration. The control rules out the alternative reading: coarsening our own
+series costs 40% of the figure, while coarsening the DEM over the same ground
+costs nothing, so what coarsening drops is noise.
 
-A grid search over that reference puts the window at **±30 s with the
-threshold unchanged at 4 m** (total 1.32× the reference, per-stretch error
-5.6 m against 17.1 m today), and every variant that widens further or raises
-the threshold begins undershooting the real climbs — a third confirmation that
-the threshold was never the wrong part. The residual 1.32× is where to stop,
-since a DEM erases kerbs, stairs and small undulations: the truth sits between
-the two. The change is not in this version: it moves a headline number by about
-40% and makes the live figure trail the walk by half a minute, so it waits for
-the owner's decision (`docs/SAHA.md`, Y-3).
+Twelve window-and-threshold pairs were then scored over those stretches, on the
+total and on the per-stretch error, counting undershoot as a fault so that
+heavy smoothing could not win by erasing climb. **±30 s with the threshold
+unchanged** came out lowest: 1.32× the reference and 5.6 m of error per stretch,
+against 2.21× and 17.1 m at ±5 s. Every wider window or higher threshold began
+undershooting the stretches that really climb — ±30 s + 6 m on three of nine,
+±60 s + 4 m on five — which is a third independent confirmation that the
+threshold was never the wrong part. The residual 1.32× is where to stop: a DEM
+has no kerbs, stairs or overpasses in it, so the truth sits above the reference
+and below us.
+
+Measured through the production path, the change reads **▲354.5 → ▲224.5** on
+that 9 km walk and **▲171 → ▲92.5** on the Sept 24 one. The ±1 cm instability
+narrows with it, from a 33.5 m band to **12.5 m** on the 9 km walk and from
+20.4 m to 12.5 m on the shorter one — a wider window leaves fewer steps sitting
+on the threshold, so fewer of them can be flipped by noise. **Past recordings
+keep the numbers they were recorded with**, as with every method change here:
+▲/▼ was always an estimate, and silently rewriting stored figures would be
+worse than a dated method. What remains open is **D-2**, an out-and-back tour,
+which would measure our own vertical error with no second model in the chain.
 
 ### 5.5 Auto-pause
 

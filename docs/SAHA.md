@@ -278,7 +278,8 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   "amber looks better this way" — the default stays, and matrix step 22 is
   complete on both halves, the automatic arrival and the legibility.
 
-- **Y-3** (elevation metric, fixed → v1.8.0): gain and loss were inflated and
+- **Y-3** (elevation metric, fixed → v1.8.0, window calibrated → v1.9.0): gain
+  and loss were inflated and
   unstable. *Instability:* perturbing a real 1274-point series by ±1 cm moved
   the gain between **50 m and 76 m**, because a perturbation flips which step
   crosses the 4 m threshold. *Magnitude:* across sixteen field tours a median
@@ -355,9 +356,17 @@ Gate status: **3/3 clean tours — v1.0.0 CUT (Aug 29).**
   third direction, that the threshold was never the wrong part. The residual
   1.32× is expected and is where to stop: a DEM erases kerbs, stairs, overpasses
   and small undulations, so the truth sits between 127 m and 167 m. The cost is
-  that the live figure would trail the walk by half a minute instead of five
-  seconds. **Awaiting the owner's go-ahead**, because it changes a headline
-  number by about 40% and past recordings keep what they were recorded with.
+  that the live figure trails the walk by half a minute instead of five
+  seconds, and the owner took that trade → **v1.9.0**.
+
+  Measured through the production path after the change: the 9 km walk reads
+  **▲354.5 → ▲224.5** and the Sept 24 walk **▲171 → ▲92.5**. The ±1 cm
+  instability narrows at the same time — the 9 km walk's band goes from 33.5 m
+  to **12.5 m**, the Sept 24 one from 20.4 m to 12.5 m — because a wider window
+  leaves fewer steps sitting on the threshold for noise to flip. Core at 184
+  tests, with the window's own value pinned by a test rather than left to a
+  comment, and the mechanism tests moved to an explicit window so they keep
+  meaning what they say if the default ever moves again.
 
 - **Y-1** (elevation, fixed → v1.5.0): absolute altitude read about 37 m
   high. Three independent measurements agreed. Two seaside walks (Sept 1 and

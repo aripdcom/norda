@@ -274,9 +274,10 @@ class RecordingSessionTest {
             recoveredDistanceM = 500.0,
             recoveredDurationMillis = 600_000,
             lastPoint = fix(0, 0.0, alt = 100.0),
-            // 30 s apart: too sparse for the median to have a window, so the
-            // stored altitudes pass through untouched (Y-3).
-            recoveredAltitudes = listOf(0L to 100.0, 30_000L to 110.0, 60_000L to 105.0)
+            // Three minutes apart: too sparse for the median to have a window
+            // at all, so the stored altitudes pass through untouched and this
+            // test stays about prime rather than about the filter (Y-3).
+            recoveredAltitudes = listOf(0L to 100.0, 180_000L to 110.0, 360_000L to 105.0)
         )
         assertEquals(500.0, s.distanceM, 1e-9)
         assertEquals(610_000, s.durationMillis(10_000))

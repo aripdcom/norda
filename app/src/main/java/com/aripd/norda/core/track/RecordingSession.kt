@@ -17,9 +17,10 @@ class RecordingSession(
     startMonotonicMillis: Long,
     private val autoPause: AutoPauseDetector = AutoPauseDetector(),
     private val elevation: ElevationTracker = ElevationTracker(),
-    // Y-3: the accumulator is fed a ±5 s median, not raw altitudes. The live
-    // figure therefore trails the walk by about five seconds, and the tail is
-    // booked when the summary is taken.
+    // Y-3: the accumulator is fed a ±30 s median, not raw altitudes — the
+    // window is field-calibrated against a DEM reference (MVP 5.4). The live
+    // figure therefore trails the walk by about half a minute, and the tail is
+    // booked when the summary is taken, so a finished activity is complete.
     private val altitudes: AltitudeSmoother = AltitudeSmoother()
 ) {
 

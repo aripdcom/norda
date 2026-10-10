@@ -12,20 +12,36 @@ package com.aripd.norda.core.track
  * the threshold. A median removes the spikes that cause both and leaves the
  * slope, because the middle value of a window is not moved by its outliers.
  *
+ * **The half minute is measured, not chosen.** The first version of this
+ * filter used ±5 s, which removes spikes but not the slow wander of the
+ * vertical error, and nothing in a one-way recording could say how wide the
+ * window should be: every criterion available from the track alone rewards
+ * more smoothing. The Oct 10 night walk settled it, because a companion's
+ * DEM-corrected track covered 7.19 km of the same ground in nine stretches.
+ * Over it ±5 s booked 2.21× the DEM's own rise; a grid over twelve
+ * window-and-threshold pairs put the error per stretch at its lowest — 5.6 m
+ * against 17.1 — at ±30 s with the threshold left alone, and every wider
+ * window or higher threshold began undershooting the stretches that really
+ * climb. The remaining 1.32× is where to stop: a DEM has no kerbs, stairs or
+ * overpasses in it, so the truth is above the reference and below us.
+ *
  * Two decisions are worth their lines. The window is bounded in **time**, not
  * in samples: at the usual ~1 Hz cadence a nine-sample window is nine
  * seconds, but on a sparse recording — the battery-saver tour left 61 points
- * over 33 minutes — the same nine samples span ten minutes and flatten the
- * outing to nothing. And where a window holds fewer than [minSamples], the
- * value passes through untouched: with nothing to compare against, a median
- * of one or two samples is not a filter, it is a coin toss.
+ * over 33 minutes, one every 32 s — the same nine samples span ten minutes
+ * and flatten the outing to nothing. That cadence falls outside this window
+ * entirely, so such a recording passes through untouched. And where a window
+ * holds fewer than [minSamples], the value passes through untouched: with
+ * nothing to compare against, a median of one or two samples is not a filter,
+ * it is a coin toss.
  *
  * Because the window is centred, a sample can only be emitted once samples
  * newer by half a window have arrived. So the live figure trails the walk by
- * about five seconds, and [flush] books the tail when the recording ends.
+ * about half a minute, and [flush] books the tail when the recording ends —
+ * which is why a finished activity is never short of its last stretch.
  */
 class AltitudeSmoother(
-    private val halfWindowMillis: Long = 5_000L,
+    private val halfWindowMillis: Long = 30_000L,
     private val minSamples: Int = 3
 ) {
 

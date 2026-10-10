@@ -4,6 +4,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/), versioning
 follows [SemVer](https://semver.org/) — see `docs/MVP.md` section 15 for
 the rules.
 
+## [1.9.0] - 2026-10-10
+
+### Changed
+
+- Y-3: the elevation median's window widens from ±5 s to **±30 s**, and this
+  time the width is measured rather than argued. A companion's DEM-corrected
+  track over the Oct 10 night walk coincided with ours within 15 m across nine
+  stretches totalling **7.19 km** — the same ground recorded twice, by GNSS and
+  by a DEM. Over it ±5 s booked **▲281 m against the DEM's own ▲127 m**, and the
+  per-stretch pattern named the cause rather than the size: on a 601 m stretch
+  that genuinely climbs (DEM rise 19.1 m, net +19.1) the method was **exact** at
+  19.0 m, while on a 922 m stretch that ends where it began (DEM rise 10.9 m,
+  net −0.7) it said 56.5 m. Right about climb, wrong about flat ground.
+- The window was then grid-searched: twelve window-and-threshold pairs scored
+  over those stretches, with undershoot counted as a fault so heavy smoothing
+  could not win by erasing climb. ±30 s with the **threshold unchanged at 4 m**
+  came out lowest — 1.32× the reference and 5.6 m of error per stretch, against
+  2.21× and 17.1 m before — and every wider window or higher threshold began
+  undershooting the real climbs, which is a third confirmation that the
+  threshold was never the wrong part.
+- Through the production path the change reads **▲354.5 → ▲224.5** on the 9 km
+  walk and **▲171 → ▲92.5** on Sept 24's. The ±1 cm instability narrows with it,
+  from a 33.5 m band to **12.5 m**, because a wider window leaves fewer steps
+  sitting on the threshold for noise to flip.
+- The cost is accepted deliberately: the live figure now trails the walk by
+  about half a minute instead of five seconds. Taking the summary still books
+  the tail, so a finished activity is never short of its last stretch, and the
+  sparse battery-saver cadence (one point every ~32 s) falls outside the window
+  and still passes through untouched. Past recordings keep the numbers they
+  were recorded with.
+- Tests: the window's value is pinned by its own test instead of a comment, and
+  the mechanism tests now pass the window explicitly so they keep meaning what
+  they say if the default moves again (core: 184).
+
 ## [1.8.1] - 2026-09-24
 
 ### Fixed
