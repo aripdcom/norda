@@ -360,19 +360,35 @@ started), so the pair is calibrated together, not separately. Recovery after
 process death and GPX import feed the same smoother, or a recovered activity
 would read higher than the same outing recorded without interruption.
 
-**Known limit: the figure still has no fixed scale** (measured on the Sept 24
-walk, field item Y-3). A ±5 s median removes spikes, but GNSS vertical error
-also wanders slowly, and that part survives the window: on that walk 70 of the
-73 booked steps were between 4 and 6 m, with ±5 m swings inside 30 seconds, and
-reading the **same** smoothed series at coarser steps gives ▲171 m at 1 Hz, 132
-at 30 s and 109 at 60 s without ever settling. A figure that depends on the fix
-rate cannot be compared between two devices or two recording cadences, which is
-why the smoother halved the error rather than removing it. Fixing it needs a
-scale the method commits to, and choosing that scale needs a reference the
-walks do not yet provide: an **out-and-back or a loop** makes the recording its
-own reference, because the same ground must give the same height (field item
-D-2). Until then the method stays as it is rather than being tuned against a
-criterion that would reward heavier smoothing for its own sake.
+**Known limit: the window is too short, and there is now a reference that
+says so** (field item Y-3). A ±5 s median removes spikes, but GNSS vertical
+error also wanders slowly and that part survives the window: on the Sept 24
+walk 70 of the 73 booked steps were between 4 and 6 m, with ±5 m swings inside
+30 seconds, and reading the same smoothed series at coarser steps kept moving
+the total. That evidence could not settle a window on its own, because the only
+criterion available on a one-way route rewards heavier smoothing.
+
+The Oct 10 night walk supplied the missing reference from an unexpected
+direction: a companion's DEM-corrected track over the same route, giving **nine
+stretches and 7.19 km of ground measured twice**, by GNSS and by a DEM. Over
+that ground the shipped method books **▲281 m against the DEM's ▲127 m**, and
+the per-stretch pattern identifies the cause instead of just the size — on a
+601 m stretch that genuinely climbs (DEM rise 19.1 m, net +19.1) the method is
+**exact** at 19.0 m, while on a 922 m stretch that ends where it began (DEM rise
+10.9 m, net −0.7) it says 56.5 m. Right about climb, wrong about flat ground,
+which is noise and not calibration. The control rules out the alternative
+reading: coarsening our own series costs 40% of the figure while coarsening the
+DEM over the same ground costs nothing, so what coarsening drops is noise.
+
+A grid search over that reference puts the window at **±30 s with the
+threshold unchanged at 4 m** (total 1.32× the reference, per-stretch error
+5.6 m against 17.1 m today), and every variant that widens further or raises
+the threshold begins undershooting the real climbs — a third confirmation that
+the threshold was never the wrong part. The residual 1.32× is where to stop,
+since a DEM erases kerbs, stairs and small undulations: the truth sits between
+the two. The change is not in this version: it moves a headline number by about
+40% and makes the live figure trail the walk by half a minute, so it waits for
+the owner's decision (`docs/SAHA.md`, Y-3).
 
 ### 5.5 Auto-pause
 
